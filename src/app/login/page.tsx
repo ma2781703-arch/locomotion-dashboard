@@ -3,13 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { loginAction, switchUserAction } from "@/actions/auth";
+import { loginAction } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Sparkles, Shield, User, ArrowRight, AlertCircle, Loader2 } from "lucide-react";
+import { Sparkles, ArrowRight, AlertCircle, Loader2, KeyRound } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -37,27 +36,6 @@ export default function LoginPage() {
     }
   };
 
-  const handleQuickLogin = async (username: string) => {
-    setLoading(true);
-    setError(null);
-    const formData = new FormData();
-    formData.append("username", username);
-    formData.append("password", "password123");
-
-    const result = await loginAction(formData);
-    if (!result.success) {
-      setError(result.error || "Login failed");
-      setLoading(false);
-    } else {
-      if (result.role === "MANAGEMENT") {
-        router.push("/management");
-      } else {
-        router.push("/dashboard");
-      }
-      router.refresh();
-    }
-  };
-
   return (
     <div className="flex min-h-[80vh] items-center justify-center py-8">
       <div className="w-full max-w-md space-y-6">
@@ -66,9 +44,9 @@ export default function LoginPage() {
           <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 text-white shadow-lg shadow-indigo-500/25 mb-1">
             <Sparkles className="h-6 w-6" />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">Locomotion Portal</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Locomotion Agency Portal</h1>
           <p className="text-xs text-muted-foreground">
-            Sign in to access agency projects, workloads, and task management.
+            Sign in to access agency projects, staff workspaces, and capacity management.
           </p>
         </div>
 
@@ -76,9 +54,9 @@ export default function LoginPage() {
         <Card className="border-border/80 shadow-xl bg-card/90 backdrop-blur-sm">
           <form onSubmit={handleSubmit}>
             <CardHeader className="space-y-1">
-              <CardTitle className="text-lg">Staff & Management Sign In</CardTitle>
+              <CardTitle className="text-lg">Agency Sign In</CardTitle>
               <CardDescription className="text-xs">
-                Enter your credentials or use a quick 1-click demo role below.
+                Enter your agency username and password to proceed.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -95,19 +73,14 @@ export default function LoginPage() {
                   id="username"
                   name="username"
                   type="text"
-                  placeholder="e.g. sarah.director or elena.design"
+                  placeholder="e.g. admin or your username"
                   required
                   autoFocus
                 />
               </div>
 
               <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Password</Label>
-                  <span className="text-[11px] text-muted-foreground">
-                    Default demo password: <code className="text-indigo-400">password123</code>
-                  </span>
-                </div>
+                <Label htmlFor="password">Password</Label>
                 <Input
                   id="password"
                   name="password"
@@ -115,6 +88,14 @@ export default function LoginPage() {
                   placeholder="••••••••••••"
                   required
                 />
+              </div>
+
+              <div className="rounded-lg bg-indigo-950/20 border border-indigo-500/20 p-3 text-[11px] text-muted-foreground space-y-1">
+                <div className="flex items-center gap-1.5 text-indigo-300 font-semibold">
+                  <KeyRound className="h-3.5 w-3.5" />
+                  <span>Initial Management Account:</span>
+                </div>
+                <p>Username: <code className="text-foreground font-mono">admin</code> | Password: <code className="text-foreground font-mono">admin123</code></p>
               </div>
 
               <Button type="submit" className="w-full gap-2" disabled={loading}>
@@ -133,78 +114,10 @@ export default function LoginPage() {
             </CardContent>
           </form>
 
-          {/* Quick Demo Personas */}
-          <div className="px-6 pb-6 pt-2 border-t border-border/50 space-y-3">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground text-center">
-              Instant 1-Click Role Logins
-            </p>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="justify-start gap-2 h-auto py-2 border-indigo-500/30 bg-indigo-950/20 hover:bg-indigo-950/40 text-left"
-                onClick={() => handleQuickLogin("sarah.director")}
-                disabled={loading}
-              >
-                <Shield className="h-3.5 w-3.5 text-indigo-400 shrink-0" />
-                <div className="truncate">
-                  <p className="font-semibold text-indigo-300">Sarah (Management)</p>
-                  <p className="text-[10px] text-muted-foreground truncate">Head of Agency</p>
-                </div>
-              </Button>
-
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="justify-start gap-2 h-auto py-2 border-rose-500/30 bg-rose-950/20 hover:bg-rose-950/40 text-left"
-                onClick={() => handleQuickLogin("elena.design")}
-                disabled={loading}
-              >
-                <User className="h-3.5 w-3.5 text-rose-400 shrink-0" />
-                <div className="truncate">
-                  <p className="font-semibold text-rose-300">Elena (Staff)</p>
-                  <p className="text-[10px] text-muted-foreground truncate">Overloaded (6 tasks)</p>
-                </div>
-              </Button>
-
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="justify-start gap-2 h-auto py-2 border-emerald-500/30 bg-emerald-950/20 hover:bg-emerald-950/40 text-left"
-                onClick={() => handleQuickLogin("sofia.media")}
-                disabled={loading}
-              >
-                <User className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
-                <div className="truncate">
-                  <p className="font-semibold text-emerald-300">Sofia (Staff)</p>
-                  <p className="text-[10px] text-muted-foreground truncate">Available (0 tasks)</p>
-                </div>
-              </Button>
-
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="justify-start gap-2 h-auto py-2 border-blue-500/30 bg-blue-950/20 hover:bg-blue-950/40 text-left"
-                onClick={() => handleQuickLogin("david.dev")}
-                disabled={loading}
-              >
-                <User className="h-3.5 w-3.5 text-blue-400 shrink-0" />
-                <div className="truncate">
-                  <p className="font-semibold text-blue-300">David (Staff)</p>
-                  <p className="text-[10px] text-muted-foreground truncate">Optimal (3 tasks)</p>
-                </div>
-              </Button>
-            </div>
-          </div>
-
           <CardFooter className="flex justify-center border-t border-border/40 py-3 text-xs text-muted-foreground">
-            Don&apos;t have an account?{" "}
+            Don&apos;t have an account yet?{" "}
             <Link href="/register" className="ml-1 text-primary underline-offset-4 hover:underline">
-              Register here
+              Register new Staff/Management
             </Link>
           </CardFooter>
         </Card>

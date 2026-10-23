@@ -6,7 +6,7 @@ import { ManagementClient } from "./ManagementClient";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ShieldAlert, Users, ArrowRight, Sparkles } from "lucide-react";
+import { ShieldAlert, ArrowRight, ShieldCheck } from "lucide-react";
 
 export default async function ManagementPage() {
   const currentUser = await getCurrentUser();
@@ -41,11 +41,11 @@ export default async function ManagementPage() {
             </p>
             <div className="p-3.5 rounded-lg bg-secondary/50 border border-border/60 space-y-1.5">
               <p className="font-semibold text-foreground flex items-center gap-1.5">
-                <Sparkles className="h-3.5 w-3.5 text-indigo-400" />
-                <span>Want to test the Management view?</span>
+                <ShieldCheck className="h-3.5 w-3.5 text-indigo-400" />
+                <span>Need Management Access?</span>
               </p>
               <p className="text-[11px]">
-                Use the quick persona switcher in the top navigation bar or switch to <strong>Sarah Jenkins (Head of Agency)</strong> to inspect the agency-wide capacity radar.
+                Please sign in with your executive management credentials or contact your agency administrator to elevate your account permissions.
               </p>
             </div>
             <div className="flex flex-col sm:flex-row items-center gap-2 pt-2">

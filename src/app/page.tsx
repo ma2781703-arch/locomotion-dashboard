@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,14 +11,16 @@ import {
   ShieldCheck,
   ArrowRight,
   Sparkles,
-  Users,
-  Layers,
-  Activity,
   CheckCircle2,
 } from "lucide-react";
 
 export default async function HomePage() {
   const user = await getCurrentUser();
+  const projectCount = await prisma.project.count();
+  const staffCount = await prisma.user.count({ where: { role: "STAFF" } });
+  const activeTaskCount = await prisma.task.count({
+    where: { status: { in: ["To Do", "On Progress"] } },
+  });
 
   return (
     <div className="space-y-10 py-6 animate-fade-in">
@@ -37,7 +40,7 @@ export default async function HomePage() {
           </h1>
 
           <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
-            Centralized creative operations platform. Track global brand deliverables, monitor cross-department staff capacity, and empower talent with private self-directed task workspaces.
+            Centralized creative operations platform. Track brand deliverables, monitor cross-department staff capacity, and empower talent with private self-directed task workspaces.
           </p>
 
           <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -66,7 +69,7 @@ export default async function HomePage() {
             ) : (
               <div className="text-xs text-muted-foreground flex items-center gap-1.5 pl-2">
                 <ShieldCheck className="h-4 w-4 text-emerald-400" />
-                <span>Signed in as <strong className="text-foreground">{user ? user.name : "Staff"}</strong> ({user ? user.role : "STAFF"})</span>
+                <span>Signed in as <strong className="text-foreground">{user ? user.name : "Guest"}</strong> ({user ? user.role : "Not logged in"})</span>
               </div>
             )}
           </div>
@@ -105,7 +108,7 @@ export default async function HomePage() {
               </li>
               <li className="flex items-start gap-2">
                 <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
-                <span>Quick Action: <em>"Add My Task for this Project"</em> directly inside project view.</span>
+                <span>Quick Action: <em>&ldquo;Add My Task for this Project&rdquo;</em> directly inside project view.</span>
               </li>
             </ul>
             <Button asChild variant="outline" className="w-full justify-between">
@@ -202,26 +205,26 @@ export default async function HomePage() {
         </Card>
       </div>
 
-      {/* Agency Metrics Banner */}
+      {/* Live Agency Metrics Banner */}
       <div className="rounded-xl border border-border/60 bg-card/60 p-6 flex flex-wrap items-center justify-around gap-6 text-center">
         <div>
-          <p className="text-2xl font-bold text-foreground">5</p>
+          <p className="text-2xl font-bold text-foreground">{projectCount}</p>
           <p className="text-xs text-muted-foreground">Active Agency Projects</p>
         </div>
         <div className="h-8 w-px bg-border/60 hidden sm:block" />
         <div>
-          <p className="text-2xl font-bold text-foreground">6</p>
-          <p className="text-xs text-muted-foreground">Staff Creative Specialists</p>
+          <p className="text-2xl font-bold text-foreground">{staffCount}</p>
+          <p className="text-xs text-muted-foreground">Registered Staff Specialists</p>
         </div>
         <div className="h-8 w-px bg-border/60 hidden sm:block" />
         <div>
-          <p className="text-2xl font-bold text-emerald-400">2 Available</p>
-          <p className="text-xs text-muted-foreground">Ready for New Briefs</p>
+          <p className="text-2xl font-bold text-indigo-400">{activeTaskCount}</p>
+          <p className="text-xs text-muted-foreground">Active Tasks In Flight</p>
         </div>
         <div className="h-8 w-px bg-border/60 hidden sm:block" />
         <div>
-          <p className="text-2xl font-bold text-rose-400">1 Overloaded</p>
-          <p className="text-xs text-muted-foreground">Requires Workload Rebalancing</p>
+          <p className="text-2xl font-bold text-emerald-400">RBAC Active</p>
+          <p className="text-xs text-muted-foreground">Strict Staff / Management Access</p>
         </div>
       </div>
     </div>
